@@ -96,17 +96,33 @@ function Services() {
 }
 
 /* Horizontal-scroll gallery with lightbox.
-   To add real images: drop files at /public/assets/gallery/ and edit the
-   `src` paths below. While `src` is null, an intentional placeholder shows. */
+   Drop image files at /public/assets/gallery/ named like the `slug` below.
+   The component tries .jpg → .jpeg → .png → .webp → .svg and falls back to
+   an intentional placeholder if none of them is present. */
 const GALLERY = [
-  { tag: 'FIFA World Cup',     src: '/assets/gallery/01-fifa-world-cup.jpg',     alt: 'FIFA World Cup' },
-  { tag: 'F1 hospitality',     src: '/assets/gallery/02-f1-hospitality.jpg',     alt: 'F1 hospitality' },
-  { tag: 'The Open',           src: '/assets/gallery/03-the-open.jpg',           alt: 'The Open Championship' },
-  { tag: 'Ryder Cup',          src: '/assets/gallery/04-ryder-cup.jpg',          alt: 'Ryder Cup' },
-  { tag: 'Stadium operations', src: '/assets/gallery/05-stadium-operations.jpg', alt: 'Stadium operations' },
-  { tag: 'VIP experience',     src: '/assets/gallery/06-vip-experience.jpg',     alt: 'VIP experience' },
-  { tag: 'Accommodation',      src: '/assets/gallery/07-accommodation.jpg',      alt: 'Accommodation' },
+  { slug: '01-fifa-world-cup',     tag: 'FIFA World Cup',     alt: 'FIFA World Cup' },
+  { slug: '02-f1-hospitality',     tag: 'F1 hospitality',     alt: 'F1 hospitality' },
+  { slug: '03-the-open',           tag: 'The Open',           alt: 'The Open Championship' },
+  { slug: '04-ryder-cup',          tag: 'Ryder Cup',          alt: 'Ryder Cup' },
+  { slug: '05-stadium-operations', tag: 'Stadium operations', alt: 'Stadium operations' },
+  { slug: '06-vip-experience',     tag: 'VIP experience',     alt: 'VIP experience' },
+  { slug: '07-accommodation',      tag: 'Accommodation',      alt: 'Accommodation' },
 ];
+
+/* Try each extension in order, hand the first hit to <Photo>. */
+function GalleryPhoto({ slug, tag, alt }) {
+  const exts = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
+  const [i, setI] = React.useState(0);
+  if (i >= exts.length) return <Photo className="gallery__photo" tag={tag} />;
+  return (
+    <img
+      className="photo photo--img gallery__photo"
+      src={'/assets/gallery/' + slug + '.' + exts[i]}
+      alt={alt || tag}
+      onError={() => setI(i + 1)}
+    />
+  );
+}
 
 function Gallery() {
   const [open, setOpen] = React.useState(null);
@@ -146,22 +162,37 @@ function Gallery() {
         <div className="gallery__track">
           {GALLERY.map((g, i) => (
             <button type="button" className="gallery__item" key={i} onClick={() => onItem(i)} aria-label={'Enlarge: ' + g.tag}>
-              <Photo className="gallery__photo" src={g.src} tag={g.tag} alt={g.alt || g.tag} />
+              <GalleryPhoto slug={g.slug} tag={g.tag} alt={g.alt} />
             </button>
           ))}
         </div>
       </div>
       <Modal open={open !== null} onClose={() => setOpen(null)} variant="lightbox">
         {open !== null && (
-          GALLERY[open].src
-            ? <img className="lightbox__img" src={GALLERY[open].src} alt={GALLERY[open].alt || GALLERY[open].tag} />
-            : <div className="lightbox__ph">
-                <span className="photo__ph"><i data-lucide="image"></i></span>
-                <span className="lightbox__tag">{GALLERY[open].tag}</span>
-              </div>
+          <LightboxImage slug={GALLERY[open].slug} tag={GALLERY[open].tag} alt={GALLERY[open].alt} />
         )}
       </Modal>
     </section>
+  );
+}
+
+/* Lightbox image with the same extension cascade. */
+function LightboxImage({ slug, tag, alt }) {
+  const exts = ['jpg', 'jpeg', 'png', 'webp', 'svg'];
+  const [i, setI] = React.useState(0);
+  if (i >= exts.length) return (
+    <div className="lightbox__ph">
+      <span className="photo__ph"><i data-lucide="image"></i></span>
+      <span className="lightbox__tag">{tag}</span>
+    </div>
+  );
+  return (
+    <img
+      className="lightbox__img"
+      src={'/assets/gallery/' + slug + '.' + exts[i]}
+      alt={alt || tag}
+      onError={() => setI(i + 1)}
+    />
   );
 }
 
