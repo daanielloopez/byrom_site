@@ -1,19 +1,27 @@
 /* Byrom Home — Group, Global presence, Closing + newsletter, Footer */
 
-/* To use real group logos: drop PNGs at /public/assets/group/ and ensure
-   the `file` names below match. While missing, the company name is shown. */
+/* To use real group logos: drop image files (.svg / .png / .webp) at
+   /public/assets/group/ — the component below tries each extension until
+   one loads, then falls back to the company name. */
 const GROUP = [
-  { name: 'MATCH Hospitality AG',   file: '/assets/group/match-hospitality.png',   href: 'https://match-hospitality.com/' },
-  { name: 'MATCH Services AG',      file: '/assets/group/match-services.png',      href: null },
-  { name: 'MATCH Accommodation AG', file: '/assets/group/match-accommodation.png', href: null },
-  { name: 'GTS Events Limited',     file: '/assets/group/gts-events.png',          href: 'https://www.rcts.co.uk/' },
+  { name: 'MATCH Hospitality AG',   slug: 'match-hospitality',   href: 'https://match-hospitality.com/' },
+  { name: 'MATCH Services AG',      slug: 'match-services',      href: null },
+  { name: 'MATCH Accommodation AG', slug: 'match-accommodation', href: null },
+  { name: 'GTS Events Limited',     slug: 'gts-events',          href: 'https://www.rcts.co.uk/' },
 ];
 
-function GroupLogo({ name, file }) {
-  const [ok, setOk] = React.useState(true);
-  return ok
-    ? <img src={file} alt={name} className="group__logoimg" onError={() => setOk(false)} />
-    : <span>{name}</span>;
+function GroupLogo({ name, slug }) {
+  const tries = ['svg', 'png', 'webp'];
+  const [i, setI] = React.useState(0);
+  if (i >= tries.length) return <span>{name}</span>;
+  return (
+    <img
+      src={'/assets/group/' + slug + '.' + tries[i]}
+      alt={name}
+      className="group__logoimg"
+      onError={() => setI(i + 1)}
+    />
+  );
 }
 
 function Group() {
