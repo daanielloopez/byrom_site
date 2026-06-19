@@ -124,7 +124,7 @@
   --container:    1280px;
   --gutter:       24px;
   --pad-x:        clamp(1.25rem, 5vw, 4rem);
-  --section-y:    clamp(4rem, 10vw, 8rem); /* @kind spacing */
+  --section-y:    clamp(2.75rem, 5vw, 4.75rem); /* @kind spacing */
   --radius-card:  12px;
   --radius-img:   10px;
   --radius-btn:   4px;
