@@ -196,45 +196,11 @@ function LightboxImage({ slug, tag, alt }) {
   );
 }
 
-function Tech() {
-  return (
-    <section className="section section--blue" id="technology">
-      <Container>
-        <div className="shead reveal" style={{ maxWidth: 760 }}>
-          <Eyebrow>Proprietary technology</Eyebrow>
-          <h2 style={{ color: '#fff' }}>Software built for events at world-cup scale.</h2>
-        </div>
-        <div className="tech__grid">
-          <div className="tech__card reveal">
-            <div className="tech__kicker">Accommodation platform</div>
-            <div className="tech__name">Check-In™</div>
-            <p>
-              Our proprietary accommodation system manages tens of thousands of room nights
-              across vast hotel portfolios — allocation, contracting and guest delivery,
-              all in one place.
-            </p>
-          </div>
-          <div className="tech__card reveal" style={{ transitionDelay: '90ms' }}>
-            <div className="tech__kicker">Ticketing platform</div>
-            <div className="tech__name">ENTRADA</div>
-            <p>
-              A bespoke ticketing engine engineered for the world’s biggest events —
-              flexible, secure and proven across multiple FIFA World Cup tournaments.
-            </p>
-          </div>
-        </div>
-      </Container>
-    </section>
-  );
-}
-
 const EVENTS = [
   ['FIFA World Cup™', 'Global · Recurring', 'Ticketing, accommodation and IT delivery across multiple tournaments.'],
   ['AFC Asian Cup', 'Qatar · 2024', 'End-to-end event services for one of Asia’s flagship competitions.'],
   ['F1 — British Grand Prix', 'Silverstone · Annual', 'Premium hospitality and logistics at one of the F1 calendar’s crown jewels.'],
-  ['The Open', 'United Kingdom · Annual', 'Hospitality and accommodation programmes for golf’s oldest major.'],
   ['Ryder Cup', 'Europe · Biennial', 'Complex VIP and transport operations for a global golfing spectacle.'],
-  ['Rugby World Cup', 'Global · Recurring', 'Coordinated accommodation and ticketing at tournament scale.'],
 ];
 
 function TrackRecord() {
@@ -261,7 +227,7 @@ function TrackRecord() {
   );
 }
 
-Object.assign(window, { Services, Gallery, Tech, TrackRecord, Timeline });
+Object.assign(window, { Services, Gallery, TrackRecord, Timeline });
 
 /* ---------- Historical timeline (Byrom-skinned) ---------- */
 const TIMELINE = [
