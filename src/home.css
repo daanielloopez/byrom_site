@@ -156,7 +156,7 @@ a { color: inherit; }
 .intro__text b { color: var(--byrom-blue); font-weight: 700; }
 
 /* ---------- Section head ---------- */
-.shead { max-width: 720px; margin-bottom: 56px; }
+.shead { max-width: 720px; margin-bottom: 40px; }
 .shead h2 { font-size: var(--fs-h2); font-weight: 700; letter-spacing: -0.015em; line-height: 1.12; color: var(--byrom-blue); margin: 18px 0 0; }
 .shead p { margin: 16px 0 0; font-size: var(--fs-body); color: var(--ink-soft); }
 .shead--center { margin-inline: auto; text-align: center; }
@@ -282,7 +282,7 @@ button.tlink { background: none; border: 0; cursor: pointer; font: inherit; }
 .group__logo:hover .group__logoimg { opacity: 1; filter: none; }
 
 /* ---------- Global presence ---------- */
-.offices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 24px; margin-top: 8px; }
+.offices { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px 24px; margin-top: 8px; }
 .office { display: flex; align-items: center; gap: 10px; padding: 14px 0; border-top: 1px solid var(--line); font-size: 1.05rem; color: var(--ink); }
 .office::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--byrom-green); flex: none; }
 .office.is-hq { font-weight: 700; color: var(--byrom-blue); }
@@ -290,7 +290,11 @@ button.tlink { background: none; border: 0; cursor: pointer; font: inherit; }
 
 /* ---------- World map ---------- */
 .wmap { position: relative; margin-top: 8px; }
-.wmap__svg { width: 100%; height: auto; display: block; overflow: visible; }
+.wmap__svg { width: 100%; height: auto; display: block; overflow: hidden; cursor: grab; touch-action: none; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-img); }
+.wmap__svg.is-drag { cursor: grabbing; }
+.wmap__zoom { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; gap: 6px; z-index: 4; }
+.wmap__zoom button { width: 36px; height: 36px; border: 1px solid var(--line); background: #fff; color: var(--byrom-blue); border-radius: 8px; font-size: 18px; line-height: 1; cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; transition: background .2s var(--ease); }
+.wmap__zoom button:hover { background: var(--byrom-blue-tint); }
 .wmap__land { fill: var(--byrom-blue-tint); stroke: #fff; stroke-width: .5; stroke-linejoin: round; }
 .wmap__pin { cursor: pointer; }
 .wmap__pin:focus { outline: none; }
