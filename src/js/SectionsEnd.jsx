@@ -28,7 +28,7 @@ function Group() {
   return (
     <section className="section" id="group">
       <Container>
-        <div className="shead reveal" style={{ maxWidth: 940 }}>
+        <div className="shead reveal" style={{ maxWidth: 'none' }}>
           <Eyebrow>Our group</Eyebrow>
           <h2>Part of a family-owned group.</h2>
           <p>
@@ -203,35 +203,86 @@ Object.assign(window, { Group, Presence, WorldMap, Closing, Footer });
 function WorldMap() {
   const locs = window.BYROM_MAP_LOCATIONS || [];
   const [sel, setSel] = React.useState(null);
-  const vb = window.BYROM_MAP_VIEWBOX || '0 0 1000 500';
-  const [, , vbW, vbH] = vb.split(' ').map(Number);
+  const svgRef = React.useRef(null);
+  const BASE = { x: 0, y: 0, w: 1000, h: 500 };
+  const [vb, setVb] = React.useState(BASE);
+  const vbRef = React.useRef(BASE);
+  const setView = (v) => { vbRef.current = v; setVb(v); };
+  const drag = React.useRef({ down: false, moved: false, sx: 0, sy: 0, ox: 0, oy: 0 });
+
+  const clamp = (v) => {
+    const w = Math.min(1000, Math.max(150, v.w));
+    const h = w / 2;
+    const x = Math.min(1000 - w, Math.max(0, v.x));
+    const y = Math.min(500 - h, Math.max(0, v.y));
+    return { x, y, w, h };
+  };
+  const zoomAround = (factor, cx, cy) => {
+    const p = vbRef.current;
+    const fx = cx == null ? p.x + p.w / 2 : cx;
+    const fy = cy == null ? p.y + p.h / 2 : cy;
+    setView(clamp({ x: fx - (fx - p.x) * factor, y: fy - (fy - p.y) * factor, w: p.w * factor, h: p.h * factor }));
+  };
+  const toVb = (clientX, clientY) => {
+    const r = svgRef.current.getBoundingClientRect();
+    const p = vbRef.current;
+    return { vx: p.x + (clientX - r.left) / r.width * p.w, vy: p.y + (clientY - r.top) / r.height * p.h };
+  };
+  const onWheel = (e) => { e.preventDefault(); const { vx, vy } = toVb(e.clientX, e.clientY); zoomAround(e.deltaY > 0 ? 1.18 : 0.85, vx, vy); };
+  const onDown = (e) => { const p = vbRef.current; drag.current = { down: true, moved: false, sx: e.clientX, sy: e.clientY, ox: p.x, oy: p.y }; };
+  const onMove = (e) => {
+    const d = drag.current; if (!d.down) return;
+    const r = svgRef.current.getBoundingClientRect(); const p = vbRef.current;
+    const dx = (e.clientX - d.sx) / r.width * p.w;
+    const dy = (e.clientY - d.sy) / r.height * p.h;
+    if (Math.abs(e.clientX - d.sx) + Math.abs(e.clientY - d.sy) > 4) d.moved = true;
+    setView(clamp({ x: d.ox - dx, y: d.oy - dy, w: p.w, h: p.h }));
+  };
+  const endDrag = () => { drag.current.down = false; };
+  const onPin = (i) => { if (!drag.current.moved) setSel(sel === i ? null : i); };
+
+  const k = vb.w / 1000; // factor para mantener pines a tamaño constante en pantalla
+  const inView = (l) => l.x >= vb.x && l.x <= vb.x + vb.w && l.y >= vb.y && l.y <= vb.y + vb.h;
+
   return (
     <section className="section" id="map">
       <Container>
         <SectionHead
           eyebrow="Map our experience"
           title="Where we’ve delivered."
-          copy="Three decades of events delivered across the globe. Select a marker to see the detail."
+          copy="Three decades of events delivered across the globe. Scroll or use + / − to zoom, drag to move, and select a marker for the detail."
         />
         <div className="wmap reveal">
-          <svg className="wmap__svg" viewBox={vb} role="img" aria-label="World map of Byrom events and offices">
-            <path className="wmap__land" d={window.BYROM_MAP_D} />
+          <svg
+            ref={svgRef} className={'wmap__svg' + (drag.current.down ? ' is-drag' : '')}
+            viewBox={vb.x + ' ' + vb.y + ' ' + vb.w + ' ' + vb.h}
+            role="img" aria-label="World map of Byrom events and offices"
+            onWheel={onWheel} onMouseDown={onDown} onMouseMove={onMove} onMouseUp={endDrag} onMouseLeave={endDrag}
+          >
+            <path className="wmap__land" d={window.BYROM_MAP_D} vectorEffect="non-scaling-stroke" />
             {locs.map((l, i) => (
               <g
                 key={i}
                 className={'wmap__pin wmap__pin--' + l.type + (sel === i ? ' is-active' : '')}
                 transform={'translate(' + l.x + ',' + l.y + ')'}
-                onClick={() => setSel(sel === i ? null : i)}
+                onClick={() => onPin(i)}
                 role="button" tabIndex={0} aria-label={l.name}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSel(sel === i ? null : i); } }}
               >
-                <circle className="wmap__hit" r="11" />
-                <circle className="wmap__dot" r={l.type === 'office' ? 3.2 : 5} />
+                <circle className="wmap__hit" r={11 * k} />
+                <circle className="wmap__dot" r={(l.type === 'office' ? 3.2 : l.type === 'hq' ? 5.5 : 5) * k} vectorEffect="non-scaling-stroke" />
               </g>
             ))}
           </svg>
-          {sel !== null && (
-            <div className="wmap__pop" style={{ left: (locs[sel].x / vbW * 100) + '%', top: (locs[sel].y / vbH * 100) + '%' }}>
+
+          <div className="wmap__zoom">
+            <button aria-label="Zoom in" onClick={() => zoomAround(0.7)}>+</button>
+            <button aria-label="Zoom out" onClick={() => zoomAround(1.42)}>−</button>
+            <button aria-label="Reset" onClick={() => setView(BASE)}>⤢</button>
+          </div>
+
+          {sel !== null && inView(locs[sel]) && (
+            <div className="wmap__pop" style={{ left: ((locs[sel].x - vb.x) / vb.w * 100) + '%', top: ((locs[sel].y - vb.y) / vb.h * 100) + '%' }}>
               <button className="wmap__popclose" aria-label="Close" onClick={() => setSel(null)}>×</button>
               {locs[sel].image && <img className="wmap__popimg" src={locs[sel].image} alt={locs[sel].name} />}
               {locs[sel].meta && <span className="wmap__popmeta">{locs[sel].meta}</span>}
