@@ -16,7 +16,7 @@ function GroupLogo({ name, slug }) {
   if (i >= tries.length) return <span>{name}</span>;
   return (
     <img
-      src={'/assets/group/' + slug + '.' + tries[i]}
+      src={'/public/assets/group/' + slug + '.' + tries[i]}
       alt={name}
       className="group__logoimg"
       onError={() => setI(i + 1)}
