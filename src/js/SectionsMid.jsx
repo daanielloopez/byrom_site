@@ -117,7 +117,7 @@ function GalleryPhoto({ slug, tag, alt }) {
   return (
     <img
       className="photo photo--img gallery__photo"
-      src={'/assets/gallery/' + slug + '.' + exts[i]}
+      src={'/public/assets/gallery/' + slug + '.' + exts[i]}
       alt={alt || tag}
       onError={() => setI(i + 1)}
     />
@@ -189,7 +189,7 @@ function LightboxImage({ slug, tag, alt }) {
   return (
     <img
       className="lightbox__img"
-      src={'/assets/gallery/' + slug + '.' + exts[i]}
+      src={'/public/assets/gallery/' + slug + '.' + exts[i]}
       alt={alt || tag}
       onError={() => setI(i + 1)}
     />
